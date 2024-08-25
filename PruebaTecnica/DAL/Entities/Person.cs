@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using PruebaTecnica.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PruebaTecnica.DAL.Entities
@@ -16,5 +17,8 @@ namespace PruebaTecnica.DAL.Entities
         public string Email { get; set; }
         [Display(Name = "Telefono")]
         public string Phone { get; set; }
+        public string Password { get; set; }
+
+        public UserType userType { get; set; }
     }
 }
