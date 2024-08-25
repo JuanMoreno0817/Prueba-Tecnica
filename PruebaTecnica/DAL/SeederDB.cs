@@ -143,6 +143,7 @@ namespace PruebaTecnica.DAL
                     userType = (UserType)1
                 });
             }
+            await _context.SaveChangesAsync();
         }
     }
 }

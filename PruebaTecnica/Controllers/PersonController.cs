@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using CsvHelper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PruebaTecnica.DAL;
 using PruebaTecnica.DAL.Entities;
 using PruebaTecnica.DTOs;
+using System.Formats.Asn1;
+using System.Globalization;
 using System.Linq;
 
 namespace PruebaTecnica.Controllers
@@ -124,6 +127,27 @@ namespace PruebaTecnica.Controllers
             await _context.SaveChangesAsync();
 
             return Ok(String.Format("La persona {0} fue eliminada con éxito!", Person.Name));
+        }
+
+        [HttpPost, ActionName("CreatePersons")]
+        [Route("CreatePersons")]
+        public async Task<IActionResult> UploadCsv(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("No file uploaded");
+            }
+
+            using (var stream = new StreamReader(file.OpenReadStream()))
+            {
+                var csvReader = new CsvReader(stream, new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture));
+                var records = csvReader.GetRecords<Person>().ToList();
+                
+                _context.Persons.AddRange(records);
+                await _context.SaveChangesAsync();
+            }
+
+            return Ok("Archivo subido correctamente");
         }
     }
 }
