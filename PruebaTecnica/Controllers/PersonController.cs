@@ -23,6 +23,7 @@ namespace PruebaTecnica.Controllers
             _context = context;
         }
 
+        [Authorize]
         [HttpGet, ActionName("Get")]
         [Route("GetPersons")]
         public async Task<ActionResult<IEnumerable<Person>>> GetPersons()
@@ -32,34 +33,25 @@ namespace PruebaTecnica.Controllers
             return Persons;
         }
 
-        [HttpGet, ActionName("Get")]
-        [Route("GetPerson/{id}")]
-        public async Task<ActionResult<Person>> GetPersonByIdentification(int id)
+        [Authorize]
+        [HttpPost]
+        [Route("GetPerson")]
+        public async Task<ActionResult<Person>> GetPersonByIdentification([FromBody] SearchDTO filter)
         {
-            var Person = await _context.Persons.FirstOrDefaultAsync(a => a.Identification == id);
+            var person = await _context.Persons.Where(p => p.Identification.ToString().Contains(filter.Identification.ToString())).ToListAsync();
 
-            if (Person == null) return NotFound("Person not found");
+            if (person == null) return NotFound("Person not found");
 
-            return Person;
+            return Ok(person);
         }
 
-        [HttpGet, ActionName("Get")]
-        [Route("GetPersonByFilter/{id}")]
-        public async Task<ActionResult<Person>> GetPersonByFilter([FromBody] SearchDTO filter)
+        [Authorize]
+        [HttpPost]
+        [Route("GetPersonByFilter")]
+        public async Task<ActionResult<Person>> GetPersonByName([FromBody] SearchDTO? filter)
         {
-            var query = _context.Persons.AsQueryable();
 
-            if (!String.IsNullOrEmpty(filter.Nombre))
-            {
-                query = query.Where(p => p.Name == filter.Nombre);
-            }
-
-            if (filter.Identification.HasValue)
-            {
-                query = query.Where(p => p.Identification == filter.Identification);
-            }
-
-            var persons = await query.ToListAsync();
+            var persons = await _context.Persons.Where(p => p.Name.Contains(filter.Nombre)).ToListAsync();
 
             if (!persons.Any())
             {
@@ -71,64 +63,66 @@ namespace PruebaTecnica.Controllers
 
         [HttpPost, ActionName("Create")]
         [Route("CreatePerson")]
-        public async Task<ActionResult<Person>> CreatePerson(Person Person)
+        public async Task<ActionResult<Person>> CreatePerson(Person person)
         {
             try
             {
-                _context.Persons.Add(Person);
+                person.ID = new Guid();
+                _context.Persons.Add(person);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException ex)
             {
                 if (ex.InnerException.Message.Contains("duplicate"))
-                    return Conflict(String.Format("{0} ya existe", Person.Identification));
+                    return Conflict(String.Format("{0} ya existe",person.Identification));
             }
             catch (Exception ex)
             {
                 return Conflict(ex.Message);
             }
 
-            return Ok(Person);
+            return Ok(person);
         }
 
+        [Authorize]
         [HttpPut, ActionName("Edit")]
-        [Route("EditPerson/{id}")]
-        public async Task<IActionResult> EditPerson(int id, Person Person)
+        [Route("EditPerson")]
+        public async Task<IActionResult> EditPerson(Person person)
         {
             try
             {
-                if (id != Person.Identification) return NotFound("Person not found");
-
-                _context.Persons.Update(Person);
+                _context.Persons.Update(person);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException ex)
             {
                 if (ex.InnerException.Message.Contains("duplicate"))
-                    return Conflict(String.Format("{0} ya existe", Person.Identification));
+                    return Conflict(String.Format("{0} ya existe", person.Identification));
             }
             catch (Exception ex)
             {
                 return Conflict(ex.Message);
             }
 
-            return Ok(Person);
+            return Ok(person);
         }
 
+        [Authorize(Policy = "Admin")]
         [HttpDelete, ActionName("Delete")]
         [Route("DeletePerson/{id}")]
         public async Task<IActionResult> DeletePerson(int id)
         {
-            var Person = await _context.Persons.FirstOrDefaultAsync(a => a.Identification == id);
+            var person = await _context.Persons.FirstOrDefaultAsync(a => a.Identification == id);
 
-            if (Person == null) return NotFound("Person not found");
+            if (person == null) return NotFound("Person not found");
 
-            _context.Persons.Remove(Person);
+            _context.Persons.Remove(person);
             await _context.SaveChangesAsync();
 
-            return Ok(String.Format("La persona {0} fue eliminada con éxito!", Person.Name));
+            return Ok(String.Format("La persona {0} fue eliminada con éxito!", person.Name));
         }
 
+        [Authorize]
         [HttpPost, ActionName("CreatePersons")]
         [Route("CreatePersons")]
         public async Task<IActionResult> UploadCsv(IFormFile file)
@@ -142,7 +136,9 @@ namespace PruebaTecnica.Controllers
             {
                 var csvReader = new CsvReader(stream, new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture));
                 var records = csvReader.GetRecords<Person>().ToList();
-                
+                foreach (Person x in records) { 
+                    x.ID = Guid.NewGuid();
+                }
                 _context.Persons.AddRange(records);
                 await _context.SaveChangesAsync();
             }

@@ -4,16 +4,13 @@
         <a class="ms-2" routerLink="home"><img src="" class="" width="150" /></a>
       </div>
       <div class="col-auto my-auto px-0">
-        <a *ngIf="!log" type="button" class="btn btn-sm btn-outline-blue my-auto mx-1" routerLink="login">Ingresar</a>
-        <a *ngIf="!log" type="button" class="btn btn-green my-auto mx-1" routerLink="signin">Regístrate</a>
-        <a *ngIf="log" type="button" class="btn btn-sm btn-outline-danger my-auto mx-1" (click)="logOut()">Salir</a>
-        <a *ngIf="log" class="btn btn-outline-blue my-auto mx-2" routerLink="psicologo">Psicologo</a>
-        <a *ngIf="log" class="btn btn-outline-blue my-auto mx-2" routerLink="veterinario">Veterinario</a>
-        <a *ngIf="log" class="btn btn-outline-blue my-auto mx-2" routerLink="adoptante">Adoptante</a>
-        <a *ngIf="log" class="btn btn-green my-auto mx-2" routerLink="gallery">Galería</a>
-        <a *ngIf="log" class="my-auto mx-1">
+        <a type="button" class="btn btn-sm btn-outline-blue my-auto mx-1" routerLink="persona">Inicio</a>
+        <a type="button" class="btn btn-sm btn-outline-blue my-auto mx-1" routerLink="login">Ingresar</a>
+        <a type="button" class="btn btn-green my-auto mx-1" routerLink="signup">Regístrate</a>
+        <a type="button" class="btn btn-sm btn-outline-danger my-auto mx-1" (click)="logout()">Salir</a>
+        <a class="my-auto mx-1">
           <img src="../../assets/person-circle.svg" class="rounded-circle" width="32" />
         </a>
       </div>
     </div>
-  </nav>
+</nav>

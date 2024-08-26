@@ -1,0 +1,44 @@
+<div class="container">
+    <div class="row py-5 mx-0 justify-content-center">
+        <form [formGroup]="filterForm" (ngSumbit)="getPersonsByFilter()">
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="inputGroup-sizing-default">Buscar</span>
+                <input type="text" class="form-control" formControlName="searchTerm" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+            </div>
+        </form>
+        <ng-container *ngIf="personas && personas.length > 0">
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">Identificación</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Correo</th>
+                    <th scope="col">Telefono</th>
+                    <th scope="col">Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let person of personas | paginate: { itemsPerPage: 5, currentPage: page }">
+                    <th>{{ person.identification }}</th>
+                    <td>{{ person.name }}</td>
+                    <td>{{ person.email }}</td>
+                    <td>{{ person.phone }}</td>
+                    <button type="button" class="btn btn-outline-info my-2" (click)="information(person.identification)">Info</button>
+                  </tr>
+                </tbody>
+              </table>
+              <pagination-controls (pageChange)="page = $event"></pagination-controls>
+        </ng-container>
+        <ng-container *ngIf="personas.length === 0">
+            <div class="alert alert-danger" role="alert">
+                No se encontraron personas.
+            </div>
+        </ng-container>
+    </div>
+    <h1>Agrega tu archivo CSV aquí</h1>
+    <div class="input-group mb-3">
+      <input type="file" class="form-control" id="inputGroupFile02" (change)="onFileChange($event)">
+      <label class="input-group-text" for="inputGroupFile02">Upload</label>
+      <button class="btn btn-primary mx-2" (click)="uploadFile()">Submit</button>
+    </div>
+</div>
