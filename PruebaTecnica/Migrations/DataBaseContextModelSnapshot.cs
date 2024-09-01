@@ -24,7 +24,7 @@ namespace PruebaTecnica.Migrations
 
             modelBuilder.Entity("PruebaTecnica.DAL.Entities.Person", b =>
                 {
-                    b.Property<Guid>("ID")
+                    b.Property<Guid?>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 

@@ -19,6 +19,9 @@ export class InformationService {
   deletePersona(id: number):Observable<string>{
     const token = localStorage.getItem('Token'); // Obtén el token del localStorage
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.httpClient.delete<string>(`https://localhost:7227/api/Person/DeletePerson/${id}`, { headers });
+    return this.httpClient.delete<string>(`https://localhost:7227/api/Person/DeletePerson/${id}`, 
+      { headers: headers,
+        responseType: 'text' as 'json'
+      });
   }
 }

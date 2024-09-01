@@ -6,7 +6,7 @@ namespace PruebaTecnica.DAL.Entities
 {
     public class Person
     {
-        public Guid ID { get; set; }
+        public Guid? ID { get; set; }
 
         [Display(Name = "Documento")]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]

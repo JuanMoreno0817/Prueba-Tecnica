@@ -38,6 +38,7 @@ export class PersonaService {
 
     return this.httpClient.post<any>(`https://localhost:7227/api/Person/CreatePersons`, formData, {
       headers: headers,
+      responseType: 'text' as 'json',
       reportProgress: true,
       observe: 'events'
     });

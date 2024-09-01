@@ -12,7 +12,7 @@ using PruebaTecnica.DAL;
 namespace PruebaTecnica.Migrations
 {
     [DbContext(typeof(DataBaseContext))]
-    [Migration("20240825072428_InitialMigration")]
+    [Migration("20240901185327_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -26,7 +26,7 @@ namespace PruebaTecnica.Migrations
 
             modelBuilder.Entity("PruebaTecnica.DAL.Entities.Person", b =>
                 {
-                    b.Property<Guid>("ID")
+                    b.Property<Guid?>("ID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 

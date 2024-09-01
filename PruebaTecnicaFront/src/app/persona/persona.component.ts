@@ -5,6 +5,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { SearchDTO } from './search-dto';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { HttpEventType } from '@angular/common/http';
+import { AlertaService } from '../alerta/alerta.service';
 
 @Component({
   selector: 'app-persona',
@@ -21,7 +22,7 @@ export class PersonaComponent implements OnInit{
 
   selectedFile: File | null = null;
 
-  constructor(private personaServicio: PersonaService,private activeRouter: ActivatedRoute, private router: Router,private fb: FormBuilder){
+  constructor(private personaServicio: PersonaService,private alerta: AlertaService, private router: Router,private fb: FormBuilder){
     this.filterForm = this.fb.group({
       searchTerm: [null]
     })
@@ -73,13 +74,16 @@ export class PersonaComponent implements OnInit{
       this.personaServicio.uploadCsv(this.selectedFile).subscribe({
         next: (event: any) => {
           if (event.type === HttpEventType.Response) {
-            console.log('Archivo cargado con éxito:', event.body);
+            const responseMessage = event.body as string;
+            this.alerta.showSuccess('Archivo cargado con éxito', responseMessage);
           }
         },
         error: (err) => {
-          console.error('Error al cargar el archivo:', err);
+          this.alerta.showError('Error al cargar el archivo:', err);
         }
       });
+    } else {
+      this.alerta.showError('No haz seleccionado ningún archivo.', 'Error');
     }
   }
 }

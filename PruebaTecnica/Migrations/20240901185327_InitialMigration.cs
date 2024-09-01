@@ -13,7 +13,7 @@ namespace PruebaTecnica.Migrations
                 name: "Person",
                 columns: table => new
                 {
-                    ID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ID = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     Identification = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),

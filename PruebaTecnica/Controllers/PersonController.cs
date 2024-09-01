@@ -127,20 +127,46 @@ namespace PruebaTecnica.Controllers
         [Route("CreatePersons")]
         public async Task<IActionResult> UploadCsv(IFormFile file)
         {
-            if (file == null || file.Length == 0)
+            if (file == null || file.Length == 0) 
             {
                 return BadRequest("No file uploaded");
             }
 
-            using (var stream = new StreamReader(file.OpenReadStream()))
+            using (var stream = file.OpenReadStream()) //Abrimos el archivo 
+            using (var reader = new StreamReader(stream)) //Leemos el archivo
             {
-                var csvReader = new CsvReader(stream, new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture));
-                var records = csvReader.GetRecords<Person>().ToList();
-                foreach (Person x in records) { 
-                    x.ID = Guid.NewGuid();
+                //Configuramos como debemos de leer el archivo
+                var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    Delimiter = ",", 
+                    HasHeaderRecord = true, //Tiene encabezado
+                    MissingFieldFound = null, //Por si falta algún campo, que no saque error
+                    HeaderValidated = null //No importa si los nombres de los campos coinciden
+                };
+
+                try
+                {
+                    //Acá procesamos el archivo (reader) en base a la configuración que se le dió (config)
+                    var csvReader = new CsvReader(reader, config); 
+                    var records = csvReader.GetRecords<Person>().ToList();
+
+                    if (records == null || !records.Any())
+                    {
+                        return BadRequest("El archivo CSV está vacío o mal formado.");
+                    }
+
+                    foreach (Person x in records)
+                    {
+                        x.ID = Guid.NewGuid();
+                    }
+
+                    _context.Persons.AddRange(records);
+                    await _context.SaveChangesAsync();
                 }
-                _context.Persons.AddRange(records);
-                await _context.SaveChangesAsync();
+                catch (Exception ex)
+                {
+                    return BadRequest($"Error al procesar el archivo CSV: {ex.Message}");
+                }
             }
 
             return Ok("Archivo subido correctamente");
